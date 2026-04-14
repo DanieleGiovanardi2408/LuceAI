@@ -19,176 +19,150 @@
 }
 
 /* ============================
-   BASE STYLES
+   BASE — element resets
+   Must be inside @layer base so Tailwind utilities (py-*, mb-*, gap-*, …)
+   can override them. In Tailwind v4 every utility lives in @layer utilities,
+   which is BELOW unlayered CSS in the cascade.
    ============================ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-  background: #0a0a0f;
-  color-scheme: dark;
-}
+  html {
+    scroll-behavior: smooth;
+    background: #0a0a0f;
+    color-scheme: dark;
+  }
 
-body {
-  background: #0a0a0f;
-  color: #e8eaed;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
+  body {
+    background: #0a0a0f;
+    color: #e8eaed;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
 
-::selection {
-  background: #00e5ff30;
-  color: #ffffff;
+  ::selection {
+    background: #00e5ff30;
+    color: #ffffff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0f;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #ffffff20;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ffffff40;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 /* ============================
-   TYPOGRAPHY
+   CUSTOM UTILITIES — in @layer utilities so they coexist
+   correctly with Tailwind's own utilities
    ============================ */
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+@layer utilities {
+  .glow-text {
+    text-shadow: 0 0 40px #00e5ff40, 0 0 80px #00e5ff20;
+  }
+
+  .glow-box {
+    box-shadow: 0 0 30px #00e5ff15, 0 0 60px #00e5ff08, inset 0 0 30px #00e5ff05;
+  }
+
+  .glow-border {
+    border: 1px solid #00e5ff20;
+    box-shadow: 0 0 15px #00e5ff10, inset 0 0 15px #00e5ff05;
+  }
+
+  .glass {
+    background: #111118cc;
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid #ffffff10;
+  }
+
+  .grid-overlay {
+    background-image:
+      linear-gradient(#ffffff06 1px, transparent 1px),
+      linear-gradient(90deg, #ffffff06 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .hud-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #00e5ff80;
+  }
+
+  .noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .scanline {
+    background: linear-gradient(180deg, transparent 0%, #00e5ff08 50%, transparent 100%);
+    height: 200px;
+    animation: scanMove 4s ease-in-out infinite;
+  }
 }
 
 /* ============================
-   CUSTOM SCROLLBAR
+   KEYFRAMES — outside layers (not affected by cascade)
    ============================ */
-
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0a0a0f;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ffffff20;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #ffffff40;
-}
-
-/* ============================
-   GLOW & EFFECTS
-   ============================ */
-
-.glow-text {
-  text-shadow: 0 0 40px #00e5ff40, 0 0 80px #00e5ff20;
-}
-
-.glow-box {
-  box-shadow: 0 0 30px #00e5ff15, 0 0 60px #00e5ff08, inset 0 0 30px #00e5ff05;
-}
-
-.glow-border {
-  border: 1px solid #00e5ff20;
-  box-shadow: 0 0 15px #00e5ff10, inset 0 0 15px #00e5ff05;
-}
-
-.glass {
-  background: #111118cc;
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid #ffffff10;
-}
-
-/* ============================
-   GRID OVERLAY
-   ============================ */
-
-.grid-overlay {
-  background-image: 
-    linear-gradient(#ffffff06 1px, transparent 1px),
-    linear-gradient(90deg, #ffffff06 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-.scanline {
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    #00e5ff08 50%,
-    transparent 100%
-  );
-  height: 200px;
-  animation: scanMove 4s ease-in-out infinite;
-}
 
 @keyframes scanMove {
   0%, 100% { transform: translateY(-100vh); }
-  50% { transform: translateY(100vh); }
+  50%       { transform: translateY(100vh); }
 }
-
-/* ============================
-   ANIMATED GRADIENT BORDER
-   ============================ */
 
 @keyframes borderGlow {
   0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
+  50%       { opacity: 0.8; }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50%       { transform: translateY(-10px); }
 }
 
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.4; box-shadow: 0 0 20px #00e5ff10; }
-  50% { opacity: 1; box-shadow: 0 0 40px #00e5ff30; }
+  50%       { opacity: 1;   box-shadow: 0 0 40px #00e5ff30; }
 }
 
 @keyframes dash {
   to { stroke-dashoffset: -20; }
-}
-
-/* ============================
-   NOISE TEXTURE
-   ============================ */
-
-.noise::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* ============================
-   HUD LABEL
-   ============================ */
-
-.hud-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #00e5ff80;
-}
-
-/* ============================
-   REDUCED MOTION
-   ============================ */
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  html {
-    scroll-behavior: auto;
-  }
 }

@@ -1,10 +1,5 @@
 import Navbar from '@/components/Navbar';
-import ImmersiveScene from '@/components/ImmersiveScene';
-import Method from '@/components/Method';
-import Services from '@/components/Services';
-import WhyLuce from '@/components/WhyLuce';
-import Metrics from '@/components/Metrics';
-import FinalCTA from '@/components/FinalCTA';
+import LuceAIExperience from '@/components/LuceAIExperience';
 import ContactForm from '@/components/ContactForm';
 import Footer from '@/components/Footer';
 import ScrollProgress from '@/components/ScrollProgress';
@@ -17,12 +12,9 @@ export default function Home() {
       <ScrollProgress />
       <Navbar />
       <main>
-        <ImmersiveScene />
-        <Method />
-        <Services />
-        <WhyLuce />
-        <Metrics />
-        <FinalCTA />
+        {/* 1400vh scroll-driven experience — covers entire site narrative */}
+        <LuceAIExperience />
+        {/* Contact form + footer after the experience */}
         <ContactForm />
       </main>
       <Footer />

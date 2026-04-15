@@ -1,5 +1,5 @@
 import Navbar from '@/components/Navbar';
-import AgentHero from '@/components/AgentHero';
+import ImmersiveScene from '@/components/ImmersiveScene';
 import Method from '@/components/Method';
 import Services from '@/components/Services';
 import WhyLuce from '@/components/WhyLuce';
@@ -17,7 +17,7 @@ export default function Home() {
       <ScrollProgress />
       <Navbar />
       <main>
-        <AgentHero />
+        <ImmersiveScene />
         <Method />
         <Services />
         <WhyLuce />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { SERVICES, EASING } from '@/lib/constants';
@@ -91,21 +91,45 @@ function ServiceCard({
   isInView: boolean;
 }) {
   const isLarge = index === 3; // AI/NLP card gets extra prominence
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    setTilt({
+      x: ((e.clientY - cy) / (rect.height / 2)) * -8,
+      y: ((e.clientX - cx) / (rect.width / 2)) * 8,
+    });
+  };
+
+  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ duration: 0.6, ease: EASING.reveal, delay: 0.1 + index * 0.08 }}
       className={`group relative ${isLarge ? 'sm:col-span-2 lg:col-span-1' : ''}`}
+      style={{ perspective: 800 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
-      <div className="
-        relative h-full p-6 md:p-7 rounded-2xl
-        bg-surface/60 border border-border
-        hover:border-accent/30 hover:bg-surface
-        transition-all duration-500
-        overflow-hidden
-      ">
+      <motion.div
+        style={{ transformStyle: 'preserve-3d', perspective: 800 }}
+        animate={{ rotateX: tilt.x, rotateY: tilt.y }}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        className="
+          relative h-full p-6 md:p-7 rounded-2xl
+          bg-surface/60 border border-border
+          hover:border-accent/30 hover:bg-surface
+          transition-all duration-500
+          overflow-hidden
+        "
+      >
         {/* Animated border glow on hover */}
         <div className="
           absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700
@@ -127,14 +151,18 @@ function ServiceCard({
         <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-accent/0 group-hover:bg-accent/40 transition-all duration-500" />
 
         {/* Icon */}
-        <div className="
-          w-11 h-11 rounded-xl flex items-center justify-center mb-5
-          bg-accent/5 text-accent/60 border border-accent/10
-          group-hover:bg-accent/10 group-hover:text-accent group-hover:border-accent/20
-          transition-all duration-500
-        ">
+        <motion.div
+          className="
+            w-11 h-11 rounded-xl flex items-center justify-center mb-5
+            bg-accent/5 text-accent/60 border border-accent/10
+            group-hover:bg-accent/10 group-hover:text-accent group-hover:border-accent/20
+            transition-all duration-500
+          "
+          whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+          transition={{ duration: 0.4 }}
+        >
           {ICONS[service.icon]}
-        </div>
+        </motion.div>
 
         {/* Content */}
         <h3 className="text-lg font-semibold text-foreground mb-2 tracking-tight group-hover:text-accent transition-colors duration-300">
@@ -151,7 +179,7 @@ function ServiceCard({
             module
           </span>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

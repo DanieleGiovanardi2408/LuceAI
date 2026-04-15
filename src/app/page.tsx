@@ -9,10 +9,12 @@ import FinalCTA from '@/components/FinalCTA';
 import ContactForm from '@/components/ContactForm';
 import Footer from '@/components/Footer';
 import ScrollProgress from '@/components/ScrollProgress';
+import Cursor from '@/components/Cursor';
 
 export default function Home() {
   return (
     <>
+      <Cursor />
       <ScrollProgress />
       <Navbar />
       <main>

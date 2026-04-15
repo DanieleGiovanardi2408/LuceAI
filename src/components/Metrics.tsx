@@ -78,23 +78,31 @@ export default function Metrics() {
                 hover:border-accent/20 hover:bg-surface/60
                 transition-all duration-500
               ">
+                        {/* Glow background */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <motion.div
+                    className="w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                    style={{ background: 'radial-gradient(circle, rgba(0,229,255,0.2), transparent)' }}
+                  />
+                </div>
+
                 {/* Large Number */}
-                <div className="text-5xl md:text-6xl font-bold text-accent mb-2 glow-text">
+                <div className="text-6xl md:text-7xl lg:text-8xl font-bold text-accent mb-2 glow-text relative z-10">
                   <AnimatedCounter target={metric.value} suffix={metric.suffix} />
                 </div>
 
                 {/* Label */}
-                <h3 className="text-base font-semibold text-foreground mb-1">
+                <h3 className="text-base font-semibold text-foreground mb-1 relative z-10">
                   {metric.label}
                 </h3>
 
                 {/* Description */}
-                <p className="text-xs text-muted">
+                <p className="text-xs text-muted relative z-10">
                   {metric.description}
                 </p>
 
                 {/* Decorative bottom bar */}
-                <div className="mt-6 h-0.5 w-full bg-border rounded-full overflow-hidden">
+                <div className="mt-6 h-1 w-full bg-border rounded-full overflow-hidden relative z-10">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={isInView ? { width: `${metric.value}%` } : {}}

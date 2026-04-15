@@ -20,7 +20,7 @@ export default function ScrollTelling() {
     offset: ['start start', 'end end'],
   });
 
-  const currentPhase = useTransform(scrollYProgress, [0, 0.25, 0.5, 0.75, 1], [0, 0, 1, 2, 3]);
+  const currentPhase = useTransform(scrollYProgress, [0, 0.25, 0.5, 0.75, 1], [0, 1, 2, 3, 3]);
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     progressRef.current = v;
@@ -153,7 +153,7 @@ export default function ScrollTelling() {
         if (phase === 0) alpha = d < 100 * dpr ? 0.04 : 0;
         else if (phase === 1) alpha = 0.05 + pp * 0.1;
         else if (phase === 2) alpha = 0.12 + pp * 0.15;
-        else alpha = 0.25;
+        else alpha = 0.4;
 
         if (alpha <= 0) return;
         ctx.beginPath();
@@ -186,18 +186,29 @@ export default function ScrollTelling() {
 
       // Nodes
       nodes.forEach(n => {
+        const nodeRadius = phase >= 3 ? 6 * dpr : phase >= 2 ? 5 * dpr : 3.5 * dpr;
+        const glowRadius = phase >= 3 ? 30 * dpr : phase >= 2 ? 24 * dpr : 14 * dpr;
+
         // Glow
-        const gr = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, (phase >= 2 ? 24 : 14) * dpr);
+        const gr = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
         gr.addColorStop(0, `rgba(0, 229, 255, ${n.opacity * 0.25})`);
         gr.addColorStop(1, 'rgba(0, 229, 255, 0)');
         ctx.beginPath();
-        ctx.arc(n.x, n.y, (phase >= 2 ? 24 : 14) * dpr, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, glowRadius, 0, Math.PI * 2);
         ctx.fillStyle = gr;
         ctx.fill();
 
+        // Outer semi-transparent ring in phase 3
+        if (phase >= 3) {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 12 * dpr, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0, 229, 255, 0.05)';
+          ctx.fill();
+        }
+
         // Dot
         ctx.beginPath();
-        ctx.arc(n.x, n.y, (phase >= 3 ? 5 : 3.5) * dpr, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, nodeRadius, 0, Math.PI * 2);
         ctx.fillStyle = phase >= 3
           ? `rgba(0, 229, 255, ${n.opacity})`
           : `rgba(232, 234, 237, ${n.opacity})`;
@@ -272,7 +283,7 @@ export default function ScrollTelling() {
   }, [initCanvas]);
 
   return (
-    <section ref={sectionRef} className="relative" style={{ height: '400vh' }}>
+    <section ref={sectionRef} className="relative" style={{ height: '500vh' }}>
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* Canvas */}
         <canvas
@@ -317,12 +328,12 @@ function PhasePanel({
   const start = index * 0.25;
   const end = (index + 1) * 0.25;
   const mid = start + 0.05;
-  const fadeOut = end - 0.05;
+  const fadeOut = index === SCROLL_PHASES.length - 1 ? end : end - 0.05;
 
   const opacity = useTransform(
     scrollProgress,
     [start, mid, fadeOut, end],
-    [0, 1, 1, 0]
+    [0, 1, 1, index === SCROLL_PHASES.length - 1 ? 1 : 0]
   );
   const y = useTransform(
     scrollProgress,
@@ -337,9 +348,9 @@ function PhasePanel({
       style={{ opacity, y }}
       className={`absolute top-1/2 -translate-y-1/2 z-20 max-w-sm px-6 ${isLeft ? 'left-6 md:left-12 lg:left-20' : 'right-6 md:right-12 lg:right-20'}`}
     >
-      <div className="space-y-4">
-        <span className="hud-label text-accent/60">{phase.label}</span>
-        <h3 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+      <div className="backdrop-blur-sm bg-black/30 border border-white/5 rounded-2xl p-6 space-y-3">
+        <span className="hud-label text-accent/60 text-sm">{phase.label}</span>
+        <h3 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
           {phase.title}
         </h3>
         <p className="text-sm md:text-base text-muted leading-relaxed">
@@ -363,6 +374,8 @@ function PhaseIndicator({
   const opacity = useTransform(isActive, (v: boolean) => (v ? 1 : 0.3));
   const scale = useTransform(currentPhase, (v: number) => (Math.round(v) === index ? 1.3 : 1));
 
+  const phaseLabel = label.split('—')[1]?.trim() || '';
+
   return (
     <motion.div
       style={{ opacity, scale }}
@@ -370,6 +383,7 @@ function PhaseIndicator({
       title={label}
     >
       <div className="w-2 h-2 rounded-full bg-accent" />
+      <span className="font-mono text-[9px] text-accent/40 hidden md:inline">{phaseLabel}</span>
     </motion.div>
   );
 }

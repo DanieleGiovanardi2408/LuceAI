@@ -199,6 +199,22 @@ export default function Hero() {
     },
   };
 
+  // Headline word animation
+  const headlineWords = HERO_COPY.headline.split(' ');
+  const wordVariants = {
+    hidden: { opacity: 0, y: 40, rotateX: -30 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        duration: 0.6,
+        ease: EASING.reveal,
+        delay: 0.3 + i * 0.08,
+      },
+    }),
+  };
+
   return (
     <section id="hero" className="relative w-full h-screen min-h-[700px] overflow-hidden flex items-center justify-center">
       {/* Canvas Background */}
@@ -206,6 +222,22 @@ export default function Hero() {
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #0d0d18 50%, #0a0a0f 100%)' }}
+      />
+
+      {/* Aurora gradient animated background */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,229,255,0.08) 0%, rgba(124,58,237,0.06) 40%, transparent 70%)',
+        }}
+        animate={{
+          backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
       />
 
       {/* Noise overlay */}
@@ -249,13 +281,27 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Headline */}
+        {/* Headline with word animation */}
         <motion.h1
-          variants={itemVariants}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6"
+          style={{ perspective: 800 }}
         >
-          <span className="bg-gradient-to-b from-white via-foreground to-muted bg-clip-text text-transparent">
-            {HERO_COPY.headline}
+          <span className="block">
+            {headlineWords.map((word, i) => (
+              <motion.span
+                key={`${word}-${i}`}
+                custom={i}
+                variants={wordVariants}
+                initial="hidden"
+                animate="visible"
+                className="inline-block mx-1"
+                style={{ display: 'inline-block' }}
+              >
+                <span className="bg-gradient-to-b from-white via-foreground to-muted bg-clip-text text-transparent">
+                  {word}
+                </span>
+              </motion.span>
+            ))}
           </span>
         </motion.h1>
 
@@ -268,19 +314,43 @@ export default function Hero() {
         </motion.p>
 
         {/* CTAs */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <a
             href="#contatto"
             className="
               group relative px-8 py-3.5 rounded-xl text-sm font-semibold
-              bg-accent text-background
-              hover:shadow-[0_0_30px_rgba(0,229,255,0.3)]
+              border border-accent/60 text-accent bg-accent/10
+              hover:bg-accent/20
               transition-all duration-300
               overflow-hidden
             "
+            style={{
+              boxShadow: '0 0 20px rgba(0,229,255,0.15)',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 0 40px rgba(0,229,255,0.3)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 0 20px rgba(0,229,255,0.15)';
+            }}
           >
             <span className="relative z-10">{HERO_COPY.cta}</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-accent via-soft-blue to-accent bg-[length:200%_100%] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Shine effect */}
+            <motion.div
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                backgroundSize: '200% 100%',
+              }}
+              animate={{
+                backgroundPosition: ['-200% 0', '200% 0'],
+              }}
+              transition={{
+                duration: 0.6,
+                repeat: Infinity,
+                repeatDelay: 2,
+              }}
+            />
           </a>
           <a
             href="#metodo"
@@ -294,6 +364,49 @@ export default function Hero() {
             {HERO_COPY.ctaSecondary}
           </a>
         </motion.div>
+
+        {/* Floating badges */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
+          className="flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-accent/70"
+        >
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+            className="flex items-center gap-2"
+          >
+            <span>⚡</span>
+            <span>Automazione</span>
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut', delay: 0.2 }}
+            className="flex items-center gap-2"
+          >
+            <span>🧠</span>
+            <span>AI</span>
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut', delay: 0.4 }}
+            className="flex items-center gap-2"
+          >
+            <span>&lt;/&gt;</span>
+            <span>Software</span>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        animate={{ y: [0, 8, 0] }}
+        transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+      >
+        <div className="w-0.5 h-6 bg-gradient-to-b from-accent to-transparent" />
+        <div className="text-accent/40 text-xs font-mono">SCROLL</div>
       </motion.div>
 
       {/* Bottom gradient fade */}
